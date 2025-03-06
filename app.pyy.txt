@@ -1,0 +1,51 @@
+import streamlit as st
+import google.generativeai as genai
+import random
+
+# Configure your API key
+api_key = "AIzaSyAfIoAlpsTFypcIcWv_1mygZ3GuJGcemsQ"
+genai.configure(api_key=api_key)
+generation_config = {
+    "temperature": 0.75,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
+}
+def get_joke():
+    jokes = [
+        "Why do Java developers wear glasses? Because they don't C#.",
+        "Why do programmers prefer dark mode? Because light attracts bugs!",
+        "Why was the JavaScript developer sad? Because he didn’t ‘null’ his feelings."
+    ]
+    return random.choice(jokes)
+def generate_recipe(topic, word_count):
+    st.write("### Generating your recipe...")
+    st.write(f"Here's a joke while you wait: \n\n**{get_joke()}**")
+
+    # Start a chat session
+    chat_session = genai.GenerativeModel("gemini-1.5-flash").start_chat()
+    
+    prompt = f"Write a {word_count}-word detailed recipe blog on '{topic}'."
+    
+    try:
+        response = chat_session.send_message(prompt)
+        st.success("Your recipe is ready!")
+        return response.text
+    except Exception as e:
+        st.error(f"Error generating blog: {e}")
+        return None
+st.title("Flavour Fusion: AI-Driven Recipe Blogging ")
+
+topic = st.text_input("Enter your recipe topic:", "Vegan Chocolate Cake")
+word_count = st.slider("Select word count:", 500, 2000, 1000)
+
+if st.button("Generate Recipe"):
+    recipe = generate_recipe(topic, word_count)
+    if recipe:
+        st.text_area("Generated Recipe", recipe, height=400)
+import streamlit as st
+
+st.title("Flavour Fusion: AI-Driven Recipe Blogging")
+st.write("Welcome! Enter a topic to generate a recipe blog.")
+
